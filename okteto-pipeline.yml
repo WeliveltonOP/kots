@@ -14,4 +14,5 @@ deploy:
   - cd kustomize/overlays/okteto && kustomize edit set image kurl_proxy=okteto.dev/kurl_proxy:${OKTETO_GIT_COMMIT}
 
   - kubectl apply -k kustomize/overlays/okteto
-
+devs:
+  - web/okteto.yml

@@ -1,0 +1,15 @@
+name: vendor-web
+command: make deps serve
+image: okteto.dev/kotsadm-web:${OKTETO_NAMESPACE}
+workdir: /src
+sync:
+  - .:/src
+resources:
+  limits:
+    cpu: "2"
+    memory: 4Gi
+persistentVolume:
+  enabled: true
+externalVolumes:
+  - dev-cache:yarn-cache:/cache/.yarn
+  - dev-cache:kotsadm-webpack-cache:/src/node_modules/.cache
