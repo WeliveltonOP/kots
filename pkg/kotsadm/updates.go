@@ -11,6 +11,8 @@ import (
 	"github.com/pkg/errors"
 	"github.com/replicatedhq/kots/pkg/buildversion"
 	"github.com/replicatedhq/kots/pkg/k8sutil"
+	kotsadmtypes "github.com/replicatedhq/kots/pkg/kotsadm/types"
+	"github.com/replicatedhq/kots/pkg/kotsutil"
 	"github.com/replicatedhq/kots/pkg/logger"
 	"github.com/replicatedhq/kots/pkg/rand"
 	"github.com/replicatedhq/kots/pkg/util"
@@ -96,6 +98,11 @@ func UpdateToVersion(newVersion string) error {
 
 	ns := util.PodNamespace
 
+	installationParams, err := kotsutil.GetInstallationParams(kotsadmtypes.KotsadmConfigMap)
+	if err != nil {
+		return errors.Wrap(err, "failed to get installation params")
+	}
+
 	pod := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      fmt.Sprintf("kotsadm-updater-%s", rand.StringWithCharset(10, rand.LOWER_CASE)),
@@ -119,6 +126,11 @@ func UpdateToVersion(newVersion string) error {
 						"upgrade",
 						"-n",
 						ns,
+						fmt.Sprintf("--ensure-rbac=%v", installationParams.EnsureRBAC),
+						fmt.Sprintf("--skip-rbac-check=%v", installationParams.SkipRBACCheck),
+						fmt.Sprintf("--strict-security-context=%v", installationParams.StrictSecurityContext),
+						fmt.Sprintf("--wait-duration=%v", installationParams.WaitDuration),
+						fmt.Sprintf("--with-minio=%v", installationParams.WithMinio),
 					},
 				},
 			},
