@@ -52,7 +52,7 @@ require (
 	github.com/pmezard/go-difflib v1.0.0
 	github.com/rancher/wrangler v0.8.3
 	github.com/replicatedhq/kurl v0.0.0-20210414162418-8d6211901244
-	github.com/replicatedhq/troubleshoot v0.30.0
+	github.com/replicatedhq/troubleshoot v0.31.1-0.20220312031703-ba73c7e5eb3b
 	github.com/replicatedhq/yaml/v3 v3.0.0-beta5-replicatedhq
 	github.com/robfig/cron v1.2.0
 	github.com/robfig/cron/v3 v3.0.1
@@ -95,8 +95,6 @@ require (
 	sigs.k8s.io/kustomize/kyaml v0.13.0
 	sigs.k8s.io/yaml v1.3.0
 )
-
-require golang.org/x/mod v0.5.1 // indirect
 
 require (
 	cloud.google.com/go v0.93.3 // indirect
