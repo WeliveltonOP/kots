@@ -424,7 +424,7 @@ jobs:
       - name: install kots
         run: curl https://kots.io/install/${{ github.ref_name }} | bash
 
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v3.1.0
         with:
           node-version: '17.x'
 
@@ -489,7 +489,7 @@ jobs:
       - name: install kots
         run: curl https://kots.io/install/${{ github.ref_name }} | bash
 
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v3.1.0
         with:
           node-version: '17.x'
 
@@ -554,7 +554,7 @@ jobs:
       - name: install kots
         run: curl https://kots.io/install/${{ github.ref_name }} | bash
 
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v3.1.0
         with:
           node-version: '17.x'
 
