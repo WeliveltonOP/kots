@@ -92,6 +92,8 @@ spec:
               value: "deployment"
             - name: DEBUG
               value: "false"
+            - name: IS_HELM_MANAGED
+              value: "true"
       volumes:
         - emptyDir:
             medium: Memory
