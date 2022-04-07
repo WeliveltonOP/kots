@@ -376,6 +376,12 @@ func InstallCmd() *cobra.Command {
 
 			m.ReportInstallFinish()
 
+			logs, err := getKotsadmLogs(namespace, getPodName)
+			if err != nil {
+				log.Error(errors.Wrap(err, "failed to get kotsadm logs"))
+			}
+			logKotsadmErrors(logs)
+
 			isPortForwarding := !v.GetBool("no-port-forward")
 			if isPortForwarding {
 				// if --no-port-forward not specififed, check deprecated method
@@ -751,4 +757,46 @@ func CheckRBAC() error {
 		return RBACError
 	}
 	return nil
+}
+
+func getKotsadmLogs(namespace string, getPodName func() (string, error)) ([]byte, error) {
+	podName, err := getPodName()
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get kotsadm pod name")
+	}
+
+	clientset, err := k8sutil.GetClientset()
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get clientset")
+	}
+
+	ctx := context.TODO()
+
+	pod, err := clientset.CoreV1().Pods(namespace).Get(ctx, podName, metav1.GetOptions{})
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get kotsadm pod")
+	}
+
+	logs, err := k8sutil.GetPodLogs(ctx, clientset, pod, false, nil)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get kotsadm pod logs")
+	}
+
+	return logs, nil
+}
+
+func logKotsadmErrors(logs []byte) {
+
+	// TODO: Parse the logs, check for errors, surface to stderr
+
+	// scanner := bufio.NewScanner(bytes.NewReader(logs))
+	// for scanner.Scan() {
+	// 	line := scanner.Text()
+
+	// 	if err := json.Unmarshal([]byte(line), &createBucketPodOutput); err != nil {
+	// 		continue
+	// 	}
+
+	// 	break
+	// }
 }
