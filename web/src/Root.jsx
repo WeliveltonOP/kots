@@ -27,6 +27,7 @@ import NavBar from "./components/shared/NavBar";
 
 import "./scss/index.scss";
 import connectHistory from "./services/matomo";
+import HelmLogin from "./components/HelmLogin";
 
 const INIT_SESSION_ID_STORAGE_KEY = "initSessionId";
 
@@ -65,6 +66,7 @@ class Root extends PureComponent {
     appNameSpace: null,
     appSlugFromMetadata: null,
     fetchingMetadata: false,
+    isHelmManaged: null,
     initSessionId: Utilities.localStorageEnabled()
       ? localStorage.getItem(INIT_SESSION_ID_STORAGE_KEY)
       : "",
@@ -143,7 +145,7 @@ class Root extends PureComponent {
         if (res.status === 404) {
           return;
         }
- 
+
         console.log("failed to get pending apps, unexpected status code", res.status);
         return;
       }
@@ -190,34 +192,35 @@ class Root extends PureComponent {
   fetchKotsAppMetadata = async () => {
     this.setState({ fetchingMetadata: true });
 
-    fetch(`${process.env.API_ENDPOINT}/metadata`, {
-      headers: {
-        "Content-Type": "application/json",
-        "Accept": "application/json",
-      },
-      method: "GET",
-    })
-      .then(async (res) => {
-        const data = await res.json();
-        if (!data) {
-          this.setState({ fetchingMetadata: false });
-          return;
-        }
-
-        this.setState({
-          appLogo: data.iconUri,
-          selectedAppName: data.name,
-          appSlugFromMetadata: parseUpstreamUri(data.upstreamUri),
-          appNameSpace: data.namespace,
-          adminConsoleMetadata: data.adminConsoleMetadata,
-          featureFlags: data.consoleFeatureFlags,
-          fetchingMetadata: false
-        });
-      })
-      .catch((err) => {
-        this.setState({ fetchingMetadata: false });
-        throw err;
+    try {
+      const res = await fetch(`${process.env.API_ENDPOINT}/metadata`, {
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        },
+        method: "GET",
       });
+
+      const data = await res.json();
+      if (!data) {
+        this.setState({ fetchingMetadata: false });
+        return;
+      }
+
+      this.setState({
+        appLogo: data.iconUri,
+        selectedAppName: data.name,
+        appSlugFromMetadata: parseUpstreamUri(data.upstreamUri),
+        appNameSpace: data.namespace,
+        adminConsoleMetadata: data.adminConsoleMetadata,
+        featureFlags: data.consoleFeatureFlags,
+        fetchingMetadata: false,
+        isHelmManaged: data.isHelmManaged,
+      });
+    } catch (err) {
+      this.setState({ fetchingMetadata: false });
+      throw err;
+    }
   }
 
   ping = async (tries = 0) => {
@@ -247,8 +250,8 @@ class Root extends PureComponent {
     });
   }
 
-  onRootMounted = () => {
-    this.fetchKotsAppMetadata();
+  onRootMounted = async () => {
+    await this.fetchKotsAppMetadata();
     this.ping();
 
     if (Utilities.isLoggedIn()) {
@@ -314,8 +317,10 @@ class Root extends PureComponent {
       appsList,
       rootDidInitialWatchFetch,
       connectionTerminated,
-      errLoggingOut
+      errLoggingOut,
     } = this.state;
+
+    console.log(this.state);
 
     return (
       <div className="flex-column flex1">
@@ -323,7 +328,7 @@ class Root extends PureComponent {
           <meta httpEquiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
           <meta httpEquiv="Pragma" content="no-cache" />
           <meta httpEquiv="Expires" content="0" />
-          {this.state.appLogo && 
+          {this.state.appLogo &&
             <link rel="icon" type="image/png" href={this.state.appLogo} />
           }
         </Helmet>
@@ -360,7 +365,8 @@ class Root extends PureComponent {
                   <ProtectedRoute path="/:slug/preflight" render={props => <PreflightResultPage {...props} logo={this.state.appLogo} appName={this.state.selectedAppName} appsList={appsList} fromLicenseFlow={true} refetchAppsList={this.getAppsList} />} />
                   <ProtectedRoute exact path="/:slug/config" render={props => <AppConfig {...props} fromLicenseFlow={true} refetchAppsList={this.getAppsList} />} />
                   <Route exact path="/secure-console" render={props => <SecureAdminConsole {...props} logo={this.state.appLogo} appName={this.state.selectedAppName} pendingApp={this.getPendingApp} onLoginSuccess={this.getAppsList} fetchingMetadata={this.state.fetchingMetadata} />} />
-                  <ProtectedRoute exact path="/upload-license" render={props => <UploadLicenseFile {...props} logo={this.state.appLogo} appsListLength={appsList?.length} appName={this.state.selectedAppName} appSlugFromMetadata={this.state.appSlugFromMetadata} fetchingMetadata={this.state.fetchingMetadata} onUploadSuccess={this.getAppsList} />} />
+                  <ProtectedRoute exact path="/upload-license" render={props => <UploadLicenseFile {...props} logo={this.state.appLogo} appsListLength={appsList?.length} appName={this.state.selectedAppName} isHelmManaged={this.state.isHelmManaged} appSlugFromMetadata={this.state.appSlugFromMetadata} fetchingMetadata={this.state.fetchingMetadata} onUploadSuccess={this.getAppsList} />} />
+                  <ProtectedRoute exact path="/helm-login" render={props => <HelmLogin {...props} logo={this.state.appLogo} appName={this.state.selectedAppName} isHelmManaged={this.state.isHelmManaged} appSlugFromMetadata={this.state.appSlugFromMetadata} fetchingMetadata={this.state.fetchingMetadata} onLoginSuccess={this.getAppsList} />} />
                   <ProtectedRoute exact path="/restore" render={props => <BackupRestore {...props} logo={this.state.appLogo} appName={this.state.selectedAppName} appsListLength={appsList?.length} fetchingMetadata={this.state.fetchingMetadata}/>} />
                   <ProtectedRoute exact path="/:slug/airgap" render={props => <UploadAirgapBundle {...props} showRegistry={true} logo={this.state.appLogo} appsListLength={appsList?.length} appName={this.state.selectedAppName} onUploadSuccess={this.getAppsList} fetchingMetadata={this.state.fetchingMetadata} />} />
                   <ProtectedRoute exact path="/:slug/airgap-bundle" render={props => <UploadAirgapBundle {...props} showRegistry={false} logo={this.state.appLogo} appsListLength={appsList?.length} appName={this.state.selectedAppName} onUploadSuccess={this.getAppsList} fetchingMetadata={this.state.fetchingMetadata} />} />

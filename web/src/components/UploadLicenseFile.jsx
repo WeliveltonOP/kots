@@ -38,6 +38,12 @@ class UploadLicenseFile extends React.Component {
     }
   }
 
+  componentDidUpdate(prevProps) {
+    if (this.props.isHelmManaged !== prevProps.isHelmManaged && this.props.isHelmManaged) {
+      this.props.history.replace("/helm-login");
+    }
+  }
+
   componentDidMount() {
     const { appSlugFromMetadata } = this.props;
 
@@ -308,7 +314,8 @@ class UploadLicenseFile extends React.Component {
       appsListLength,
       isBackupRestore,
       snapshot,
-      appSlugFromMetadata
+      appSlugFromMetadata,
+      isHelmManaged,
     } = this.props;
     const { licenseFile, fileUploading, errorMessage, viewErrorMessage, licenseExistErrData, selectedAppToInstall, hasMultiApp } = this.state;
     const hasFile = licenseFile && !isEmpty(licenseFile);
@@ -325,6 +332,10 @@ class UploadLicenseFile extends React.Component {
 
     // TODO remove when restore is enabled
     const isRestoreEnabled = false;
+
+    if (isHelmManaged === null) {
+      return null;
+    }
 
     return (
       <div className={`UploadLicenseFile--wrapper ${isBackupRestore ? "" : "container"} flex-column flex1 u-overflow--auto Login-wrapper justifyContent--center alignItems--center`}>

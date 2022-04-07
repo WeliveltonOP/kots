@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"os"
 
 	kotsv1beta1 "github.com/replicatedhq/kots/kotskinds/apis/kots/v1beta1"
 	"github.com/replicatedhq/kots/pkg/k8sutil"
@@ -34,6 +35,7 @@ type MetadataResponse struct {
 	// ConsoleFeatureFlags optional flags from application.yaml used to enable ui features
 	ConsoleFeatureFlags  []string             `json:"consoleFeatureFlags"`
 	AdminConsoleMetadata AdminConsoleMetadata `json:"adminConsoleMetadata"`
+	IsHelmManaged        bool                 `json:"isHelmManaged"`
 }
 
 type AdminConsoleMetadata struct {
@@ -46,9 +48,10 @@ type AdminConsoleMetadata struct {
 func GetMetadataHandler(getK8sInfoFn MetadataK8sFn) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		metadataResponse := MetadataResponse{
-			IconURI:   iconURI,
-			Name:      defaultAppName,
-			Namespace: util.PodNamespace,
+			IconURI:       iconURI,
+			Name:          defaultAppName,
+			Namespace:     util.PodNamespace,
+			IsHelmManaged: os.Getenv("IS_HELM_MANAGED") == "true",
 		}
 
 		brandingConfigMap, kotsadmMetadata, err := getK8sInfoFn()
