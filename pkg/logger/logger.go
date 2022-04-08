@@ -7,6 +7,12 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
+type LogLine struct {
+	TS    string `json:"ts"`
+	Level string `json:"level"`
+	Msg   string `json:"msg"`
+}
+
 var log *zap.Logger
 var atom zap.AtomicLevel
 

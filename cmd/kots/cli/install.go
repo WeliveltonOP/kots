@@ -1,8 +1,10 @@
 package cli
 
 import (
+	"bufio"
 	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -376,11 +378,18 @@ func InstallCmd() *cobra.Command {
 
 			m.ReportInstallFinish()
 
-			logs, err := getKotsadmLogs(namespace, getPodName)
-			if err != nil {
-				log.Error(errors.Wrap(err, "failed to get kotsadm logs"))
+			if deployOptions.License != nil && deployOptions.ConfigValues != nil {
+				// surface kotsadm errors for automated installs
+				podName, err := getPodName()
+				if err != nil {
+					log.Error(errors.Wrap(err, "failed to get kotsadm pod name"))
+				}
+				logs, err := getKotsadmLogs(namespace, podName)
+				if err != nil {
+					log.Error(errors.Wrap(err, "failed to get kotsadm logs"))
+				}
+				logKotsadmErrors(logs, log)
 			}
-			logKotsadmErrors(logs)
 
 			isPortForwarding := !v.GetBool("no-port-forward")
 			if isPortForwarding {
@@ -759,12 +768,7 @@ func CheckRBAC() error {
 	return nil
 }
 
-func getKotsadmLogs(namespace string, getPodName func() (string, error)) ([]byte, error) {
-	podName, err := getPodName()
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to get kotsadm pod name")
-	}
-
+func getKotsadmLogs(namespace string, podName string) ([]byte, error) {
 	clientset, err := k8sutil.GetClientset()
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to get clientset")
@@ -785,18 +789,19 @@ func getKotsadmLogs(namespace string, getPodName func() (string, error)) ([]byte
 	return logs, nil
 }
 
-func logKotsadmErrors(logs []byte) {
+func logKotsadmErrors(logs []byte, log *logger.CLILogger) error {
+	scanner := bufio.NewScanner(bytes.NewReader(logs))
+	for scanner.Scan() {
+		line := scanner.Text()
+		logLine := logger.LogLine{}
 
-	// TODO: Parse the logs, check for errors, surface to stderr
+		if err := json.Unmarshal([]byte(line), &logLine); err != nil {
+			continue
+		}
 
-	// scanner := bufio.NewScanner(bytes.NewReader(logs))
-	// for scanner.Scan() {
-	// 	line := scanner.Text()
-
-	// 	if err := json.Unmarshal([]byte(line), &createBucketPodOutput); err != nil {
-	// 		continue
-	// 	}
-
-	// 	break
-	// }
+		if logLine.Level == "error" {
+			log.Error(fmt.Errorf("Error: %s", logLine.Msg))
+		}
+	}
+	return scanner.Err()
 }
