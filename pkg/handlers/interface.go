@@ -78,6 +78,8 @@ type KOTSHandler interface {
 	GetAppDashboard(w http.ResponseWriter, r *http.Request)
 	GetDownstreamOutput(w http.ResponseWriter, r *http.Request)
 
+	HelmLogin(w http.ResponseWriter, r *http.Request)
+
 	GetKotsadmRegistry(w http.ResponseWriter, r *http.Request)
 	GetImageRewriteStatus(w http.ResponseWriter, r *http.Request)
 	DockerHubSecretUpdated(w http.ResponseWriter, r *http.Request)

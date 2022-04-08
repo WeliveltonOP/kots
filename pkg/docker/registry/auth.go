@@ -46,7 +46,6 @@ func LoadAuthForRegistry(endpoint string) (string, string, error) {
 }
 
 func CheckAccess(endpoint, username, password, org string, requestedAction ScopeAction) error {
-
 	endpoint = sanitizeEndpoint(endpoint)
 
 	// We need to check if we can push images to a repo.

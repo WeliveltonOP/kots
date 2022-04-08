@@ -126,6 +126,8 @@ func RegisterSessionAuthRoutes(r *mux.Router, kotsStore store.Store, handler KOT
 	r.Name("GetAirgapUploadConfig").Path("/api/v1/app/{appSlug}/airgap/config").Methods("GET").
 		HandlerFunc(middleware.EnforceAccess(policy.AppDownstreamWrite, handler.GetAirgapUploadConfig))
 
+	r.Name("HelmLogin").Path("/api/v1/helm/login").Methods("POST").
+		HandlerFunc(middleware.EnforceAccess(policy.HelmWrite, handler.HelmLogin))
 	// Implemented handlers
 	r.Name("IgnorePreflightRBACErrors").Path("/api/v1/app/{appSlug}/sequence/{sequence}/preflight/ignore-rbac").Methods("POST").
 		HandlerFunc(middleware.EnforceAccess(policy.AppDownstreamPreflightWrite, handler.IgnorePreflightRBACErrors))

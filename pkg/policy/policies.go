@@ -146,3 +146,9 @@ var (
 	AppDownstreamConfigRead  = Must(NewPolicy(ActionRead, "app.{{.appSlug}}.downstream.config."))
 	AppDownstreamConfigWrite = Must(NewPolicy(ActionWrite, "app.{{.appSlug}}.downstream.config."))
 )
+
+// Helm
+
+var (
+	HelmWrite = Must(NewPolicy(ActionWrite, "helm."))
+)

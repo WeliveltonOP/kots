@@ -7,6 +7,7 @@ import Modal from "react-modal";
 import CodeSnippet from "./shared/CodeSnippet";
 
 import "../scss/components/HelmLogin.scss";
+import { Utilities } from "../utilities/utilities";
 
 class HelmLogin extends React.Component {
   state = {
@@ -42,8 +43,35 @@ class HelmLogin extends React.Component {
     }
   }
 
-  onLogin = () => {
-    console.log("log in");
+  onLogin = async () => {
+    try {
+      const res = await fetch(`${process.env.API_ENDPOINT}/helm/login`, {
+        headers: {
+          "Authorization": Utilities.getToken(),
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          hostname: this.state.hostname,
+          username: this.state.username,
+          password: this.state.password,
+        }),
+        method: "POST",
+      });
+
+      if (res.status === 401) {
+        Utilities.logoutUser();
+        return;
+      }
+      if (res.status === 400) {
+        const body = await res.json();
+        console.log(body);
+        return;
+      }
+
+    } catch (err) {
+      console.log(err);
+      throw(err);
+    }
   }
 
   render() {
