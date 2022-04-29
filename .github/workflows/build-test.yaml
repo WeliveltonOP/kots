@@ -84,7 +84,7 @@ jobs:
         run: export $(cat .image.env | sed 's/#.*//g' | xargs) && make -C web deps build-kotsadm
 
       - name: Upload web artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: web
           path: ./web/dist
@@ -129,7 +129,7 @@ jobs:
           name: web
           path: ./web/dist
       - run: export $(cat .image.env | sed 's/#.*//g' | xargs) && make ci-test kots build
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: kots
           path: bin/kots
