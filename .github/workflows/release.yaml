@@ -12,7 +12,7 @@ jobs:
       image: schemahero/schemahero:0.12.2
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Generate fixtures
         run: |
           /schemahero fixtures \
@@ -33,7 +33,7 @@ jobs:
       options: --user root
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Download schema artifact
       uses: actions/download-artifact@v2
       with:
@@ -52,7 +52,7 @@ jobs:
     needs: [generate-fixtures]
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - uses: azure/docker-login@v1
       env:
         DOCKER_CONFIG: ./migrations/.docker
@@ -80,7 +80,7 @@ jobs:
       options: --user root
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Build web
       env:
@@ -104,7 +104,7 @@ jobs:
         go-version: '^1.17.4'
 
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Cache Go modules
       uses: actions/cache@v3
@@ -150,7 +150,7 @@ jobs:
         go-version: '^1.17.4'
 
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Cache Go modules
       uses: actions/cache@v3
@@ -186,7 +186,7 @@ jobs:
     needs: [build-web, build-go-api]
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Download go_api artifact
       uses: actions/download-artifact@v2
       with:
@@ -223,7 +223,7 @@ jobs:
         go-version: '^1.17.4'
 
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Cache Go modules
       uses: actions/cache@v3
@@ -276,7 +276,7 @@ jobs:
     needs: [release-go-api-tagged, build-kurl-proxy]
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Generate Kurl Addon PR
       env:
         GIT_TAG: ${{ github.ref_name }}
@@ -343,7 +343,7 @@ jobs:
       last_release_tag: ${{ steps.get_latest_release_tag.outputs.release }}
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Copy assets
       uses: ./actions/copy-assets
       env:
@@ -380,7 +380,7 @@ jobs:
       GIT_TAG: ${{ github.ref_name }}
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - uses: kceb/pull-request-url-action@v2
       id: pr_url
     - name: Expose git commit data
