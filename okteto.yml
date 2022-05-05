@@ -5,8 +5,8 @@ securityContext:
     add:
     - SYS_PTRACE
 sync:
-  - .:/go/src/github.com/replicatedhq/kots
-workdir: /go/src/github.com/replicatedhq/kots
+  - .:/go/src/github.com/weliveltonop/kots
+workdir: /go/src/github.com/weliveltonop/kots
 forward:
 - 2353:2345
 resources:

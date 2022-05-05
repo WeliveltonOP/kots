@@ -15,6 +15,8 @@ USERNAME=${3:-"automatic"}
 UPDATE_RC=${4:-"true"}
 export NVM_VERSION="0.38.0"
 
+git config --global --add safe.directory /home/codespace/.nvs
+
 set -e
 
 if [ "$(id -u)" -ne 0 ]; then

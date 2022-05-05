@@ -147,7 +147,7 @@ RUN --mount=target=$GOMODCACHE,id=gomodcache,type=cache \
     --mount=target=$GOCACHE,id=gocache,type=cache \
     go install github.com/go-delve/delve/cmd/dlv@v1.8.0
 
-ENV PROJECTPATH=/go/src/github.com/replicatedhq/kots
+ENV PROJECTPATH=/go/src/github.com/weliveltonop/kots
 WORKDIR $PROJECTPATH
 
 COPY go.mod go.sum ./
