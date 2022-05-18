@@ -11,5 +11,5 @@ forward:
 - 2353:2345
 resources:
   limits:
-    cpu: "2"
-    memory: 4Gi
+    cpu: "1"
+    memory: 3Gi

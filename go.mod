@@ -76,7 +76,6 @@ require (
 	gopkg.in/ini.v1 v1.63.2
 	gopkg.in/yaml.v2 v2.4.0
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
-	gotest.tools v2.2.0+incompatible
 	helm.sh/helm/v3 v3.7.1
 	k8s.io/api v0.23.1
 	k8s.io/apiextensions-apiserver v0.23.0

@@ -190,4 +190,5 @@ ARG DEBUG_KOTSADM=0
 ENV DEBUG_KOTSADM=${DEBUG_KOTSADM}
 
 ADD hack/dev/entrypoint.sh .
+RUN chmod +x ./entrypoint.sh
 ENTRYPOINT [ "./entrypoint.sh"]
